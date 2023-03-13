@@ -1,4 +1,5 @@
-import { useState, useRef } from 'react';
+import { useState, useRef ,useContext} from 'react';
+import AuthContext from '../../store/AuthContext';
 
 import classes from './AuthForm.module.css';
 
@@ -7,6 +8,8 @@ const AuthForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const newUserName = useRef();
   const newUserPassword = useRef();
+
+  const authCtx=useContext(AuthContext);
 
   const switchAuthModeHandler = () => {
     setIsLogin((prevState) => !prevState);
@@ -36,6 +39,7 @@ const AuthForm = () => {
           if (res.ok) {
             const data = await res.json();
             console.log(data);
+            authCtx.login(data.idToken);
           }
           else {
             const data_1 = await res.json();
@@ -84,6 +88,7 @@ const AuthForm = () => {
   return (
     <section className={classes.auth}>
       <h1>{isLogin ? 'Login' : 'Sign Up'}</h1>
+      {console.log(authCtx.tokens)}
       <form onSubmit={submitHandler}>
         <div className={classes.control}>
           <label htmlFor='email'>Your Email</label>
