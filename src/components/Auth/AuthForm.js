@@ -4,27 +4,82 @@ import classes from './AuthForm.module.css';
 
 const AuthForm = () => {
   const [isLogin, setIsLogin] = useState(true);
-  const [formValid,setFormValid]=useState(false);
-  const newUserName=useRef();
-  const newUserPassword=useRef();
+  const [isLoading, setIsLoading] = useState(false);
+  const newUserName = useRef();
+  const newUserPassword = useRef();
 
   const switchAuthModeHandler = () => {
     setIsLogin((prevState) => !prevState);
 
   };
 
-  const submitHandler=()=>{
-    
-    if(newUserName.current.value && newUserPassword.current.value.length<7)
-    {
-      setFormValid(false);
-     alert("Invalid username and password");
+  const submitHandler = (event) => {
+    event.preventDefault();
+    const enteredEmail = newUserName.current.value;
+    const enteredPassword = newUserPassword.current.value;
+    setIsLoading(true);
+
+    if (isLogin) {
+      fetch('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDfaJjy3LS1PJdi1F6WXFp9vNutlkkdJwA',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            email: enteredEmail,
+            password: enteredPassword,
+            returnSecureToken: true
+          }),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }).then(async (res) => {
+          setIsLoading(false)
+          if (res.ok) {
+            const data = await res.json();
+            console.log(data);
+          }
+          else {
+            const data_1 = await res.json();
+            let errorMessag = "Authentication failed";
+            if (data_1 && data_1.error && data_1.error.message) {
+              errorMessag = data_1.error.message;
+            }
+            alert(errorMessag);
+
+          }
+        })
     }
-    else{
-      setFormValid(true);
+    else {
+      fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDfaJjy3LS1PJdi1F6WXFp9vNutlkkdJwA',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            email: enteredEmail,
+            password: enteredPassword,
+            returnSecureToken: true
+          }),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      ).then((res) => {
+        setIsLoading(false);
+        if (res.ok) {
+          console.log(res.status);
+        }
+        else {
+          return res.json()
+            .then((data) => {
+              let errorMessage = "Authentication failed";
+              if (data && data.error && data.error.message) {
+                errorMessage = data.error.message;
+              }
+              alert(errorMessage);
+            });
+        }
+      });
     }
-    
-   
+
+
   }
   return (
     <section className={classes.auth}>
@@ -43,20 +98,22 @@ const AuthForm = () => {
             required
           />
         </div>
-        <div>
-          <button type='submit' >{formValid ? "SendingRequest": "Signup"}</button>
-        </div>
+
+
+
         <div className={classes.actions}>
+          {!isLoading && <button type='submit' >{isLogin ? "Login" : "Create account"}</button>}
+          {isLoading && <p>Sending request..</p>}
           <button
             type='button'
             className={classes.toggle}
             onClick={switchAuthModeHandler}
           >
             {isLogin ? 'Create new account' : 'Login with existing account'}
-            
+
           </button>
-           
-        
+
+
         </div>
       </form>
     </section>
