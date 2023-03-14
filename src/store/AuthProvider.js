@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {  useState } from "react";
 import AuthContext from "./AuthContext";
 
 const AuthProvider = (props) => {
@@ -12,6 +12,10 @@ const AuthProvider = (props) => {
         setTokenId(responseToken);
        localStorage.setItem("token",responseToken)
         console.log(responseToken);
+        setTimeout(()=>{
+            logoutUserHandler();
+            console.log("removed succesfully");
+        },20000)
     };
 
     const logoutUserHandler = () => {
@@ -25,6 +29,8 @@ const AuthProvider = (props) => {
         login: loginUserHandler,
         logout: logoutUserHandler
     };
+
+  
 
     return (
         <AuthContext.Provider value={authContext}>
