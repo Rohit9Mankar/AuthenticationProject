@@ -40,6 +40,7 @@ const AuthForm = () => {
             const data = await res.json();
             console.log(data);
             authCtx.login(data.idToken);
+           
           }
           else {
             const data_1 = await res.json();
@@ -69,6 +70,7 @@ const AuthForm = () => {
         setIsLoading(false);
         if (res.ok) {
           console.log(res.status);
+          
         }
         else {
           return res.json()
